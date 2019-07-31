@@ -148,10 +148,6 @@ func HashForApplication(app *v1alpha1.FlinkApplication) string {
 	if err != nil {
 		panic("failed to marshal deployment")
 	}
-	err = json.Unmarshal(jm, &jmDeployment)
-	if err != nil {
-		panic("failed to unmarshal deployment")
-	}
 
 	tmDeployment := taskmanagerTemplate(app)
 	tmDeployment.OwnerReferences = make([]metav1.OwnerReference, 0)
@@ -159,13 +155,9 @@ func HashForApplication(app *v1alpha1.FlinkApplication) string {
 	if err != nil {
 		panic("failed to marshal deployment")
 	}
-	err = json.Unmarshal(tm, &tmDeployment)
-	if err != nil {
-		panic("failed to unmarshal deployment")
-	}
 
 	hasher := fnv.New32a()
-	_, err = printer.Fprintf(hasher, "%#v%#v", jmDeployment, tmDeployment)
+	_, err = printer.Fprintf(hasher, "%s%s", jm, tm)
 	if err != nil {
 		// the hasher cannot actually throw an error on write
 		panic(fmt.Sprintf("got error trying when writing to hash %v", err))
